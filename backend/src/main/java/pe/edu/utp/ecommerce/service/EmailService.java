@@ -49,7 +49,17 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
             
-            helper.setFrom(mailFrom);
+            if (mailFrom != null && mailFrom.contains("<") && mailFrom.contains(">")) {
+                int start = mailFrom.indexOf('<');
+                int end = mailFrom.indexOf('>');
+                String email = mailFrom.substring(start + 1, end).trim();
+                String name = mailFrom.substring(0, start).trim();
+                if (name.isEmpty()) name = "Servitek Perú";
+                helper.setFrom(email, name);
+            } else {
+                helper.setFrom(mailFrom, "Servitek Perú");
+            }
+
             helper.setTo(destinatario);
             helper.setSubject(asunto);
             helper.setText(contenidoHtml, true);
@@ -58,6 +68,7 @@ public class EmailService {
             log.info("Correo electrónico enviado exitosamente a: {} | Asunto: {}", destinatario, asunto);
         } catch (Exception e) {
             log.error("Error al enviar correo electrónico vía SMTP a {}: {}", destinatario, e.getMessage(), e);
+            log.error("CONSEJO DIAGNÓSTICO SMTP: Si es error 535 (auth), verifica tu Contraseña de Aplicación de Gmail. Si es Timeout, verifica que Railway permita salida por puerto 587 o prueba con puerto 465.");
         }
     }
 

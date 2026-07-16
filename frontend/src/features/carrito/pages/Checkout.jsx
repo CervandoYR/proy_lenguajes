@@ -75,6 +75,10 @@ export default function Checkout() {
   const { isAuthenticated, user } = useAuthStore();
   const navigate = useNavigate();
 
+  const handleAddressAction = () => {
+    navigate("/cuenta/ajustes?tab=direccion");
+  };
+
   // Estados de la transacción: 'IDLE' | 'PROCESSING' | 'SUCCESS' | 'ERROR'
   const [txState, setTxState] = useState({
     status: "IDLE",
