@@ -60,34 +60,6 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("[Servitek] Usuario ADMIN verificado/actualizado -> Email: admin@servitek.pe | Password: admin123");
         }
 
-        if (usuarioRepository.findByEmail("cervando@servitek.pe").isEmpty()) {
-            Usuario cliente = new Usuario();
-            cliente.setNombre("Cervando");
-            cliente.setEmail("cervando@servitek.pe");
-            cliente.setPasswordHash(passwordEncoder.encode("password123"));
-            cliente.setRol(Usuario.Rol.CLIENTE);
-            cliente.setTelefono("912345678");
-            usuarioRepository.save(cliente);
-            System.out.println("[Servitek] Usuario CLIENTE creado -> Email: cervando@servitek.pe | Password: password123");
-        }
-
-        if (usuarioRepository.findByEmail("yactayocervando@gmail.com").isEmpty()) {
-            Usuario cervandoGmail = new Usuario();
-            cervandoGmail.setNombre("Cervando Yactayo");
-            cervandoGmail.setEmail("yactayocervando@gmail.com");
-            cervandoGmail.setPasswordHash(passwordEncoder.encode("123456"));
-            cervandoGmail.setRol(Usuario.Rol.ADMIN);
-            cervandoGmail.setTelefono("987654321");
-            usuarioRepository.save(cervandoGmail);
-            System.out.println("[Servitek] Usuario Cervando (Gmail) creado -> Email: yactayocervando@gmail.com | Password: 123456");
-        } else {
-            Usuario cervandoGmail = usuarioRepository.findByEmail("yactayocervando@gmail.com").get();
-            cervandoGmail.setPasswordHash(passwordEncoder.encode("123456"));
-            cervandoGmail.setRol(Usuario.Rol.ADMIN);
-            usuarioRepository.save(cervandoGmail);
-            System.out.println("[Servitek] Usuario Cervando (Gmail) verificado/actualizado -> Email: yactayocervando@gmail.com | Password: 123456");
-        }
-
         // 1. Verificar y cargar las 6 Categorías oficiales
         Categoria laptops = categoriaRepository.findBySlug("laptops")
                 .orElseGet(() -> categoriaRepository.save(
