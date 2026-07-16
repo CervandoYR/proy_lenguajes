@@ -23,7 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CulqiService {
 
-    @Value("${culqi.private-key}")
+    @Value("${culqi.private-key:sk_test_dummy_key_replace_me}")
     private String privateKey;
 
     private final PedidoRepository pedidoRepository;
