@@ -17,6 +17,24 @@ public class UsuarioController {
 
     private final UsuarioService service;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private javax.sql.DataSource dataSource;
+
+    @GetMapping("/diagnostico-bd")
+    public ResponseEntity<Map<String, Object>> diagnosticoBd() {
+        Map<String, Object> info = new HashMap<>();
+        try (java.sql.Connection conn = dataSource.getConnection()) {
+            info.put("jdbcUrl", conn.getMetaData().getURL());
+            info.put("dbUser", conn.getMetaData().getUserName());
+            info.put("dbProduct", conn.getMetaData().getDatabaseProductName() + " " + conn.getMetaData().getDatabaseProductVersion());
+            info.put("catalogOrSchema", conn.getCatalog());
+        } catch (Exception e) {
+            info.put("error", e.getMessage());
+        }
+        info.put("totalUsuarios", service.listarTodos().size());
+        return ResponseEntity.ok(info);
+    }
+
     @GetMapping
     public List<Usuario> listar() {
         return service.listarTodos();
