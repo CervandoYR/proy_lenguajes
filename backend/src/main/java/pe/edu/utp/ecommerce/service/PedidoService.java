@@ -9,6 +9,7 @@ import pe.edu.utp.ecommerce.model.Producto;
 import pe.edu.utp.ecommerce.model.Usuario;
 import pe.edu.utp.ecommerce.repository.PedidoRepository;
 import pe.edu.utp.ecommerce.repository.ProductoRepository;
+import pe.edu.utp.ecommerce.repository.PagoRepository;
 import pe.edu.utp.ecommerce.service.EmailService;
 
 
@@ -22,6 +23,7 @@ public class PedidoService {
 
     private final PedidoRepository repository;
     private final ProductoRepository productoRepository;
+    private final PagoRepository pagoRepository;
     private final EmailService emailService;
 
     public List<Pedido> listarTodos() {
@@ -100,8 +102,10 @@ public class PedidoService {
         });
     }
 
+    @Transactional
     public boolean eliminar(Long id) {
         if (repository.existsById(id)) {
+            pagoRepository.deleteByPedidoId(id);
             repository.deleteById(id);
             return true;
         }

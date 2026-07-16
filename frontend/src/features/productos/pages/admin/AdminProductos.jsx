@@ -397,7 +397,7 @@ export default function AdminProductos() {
               setEditando(null);
               setModal(true);
             }}
-            className="w-full md:w-auto px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-brand-500/20"
+            className="w-full md:w-auto px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 border border-brand-400/30"
           >
             <Plus className="w-5 h-5" /> Nuevo Producto
           </button>
@@ -483,30 +483,32 @@ export default function AdminProductos() {
                       </button>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-2.5">
                         <a
                           href={`/producto/${p.id}/${p.nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 bg-surface-700 hover:bg-emerald-500 text-slate-300 hover:text-white rounded-lg transition-colors"
-                          title="Previsualizar"
+                          className="p-2.5 bg-surface-800 hover:bg-emerald-500 text-slate-300 hover:text-white rounded-xl transition-all duration-200 cursor-pointer hover:scale-110 active:scale-90 shadow-sm hover:shadow-emerald-500/30 border border-surface-700/80 hover:border-emerald-400 flex items-center justify-center"
+                          title="Previsualizar en tienda"
                         >
                           <Eye className="w-4 h-4" />
                         </a>
                         <button
+                          type="button"
                           onClick={() => {
                             setEditando(p);
                             setModal(true);
                           }}
-                          className="p-2 bg-surface-700 hover:bg-brand-500 text-slate-300 hover:text-white rounded-lg transition-colors"
-                          title="Editar"
+                          className="p-2.5 bg-surface-800 hover:bg-brand-500 text-slate-300 hover:text-white rounded-xl transition-all duration-200 cursor-pointer hover:scale-110 active:scale-90 shadow-sm hover:shadow-brand-500/30 border border-surface-700/80 hover:border-brand-400 flex items-center justify-center"
+                          title="Editar producto"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleDelete(p.id)}
-                          className="p-2 bg-surface-700 hover:bg-rose-500 text-slate-300 hover:text-white rounded-lg transition-colors"
-                          title="Eliminar"
+                          className="p-2.5 bg-surface-800 hover:bg-rose-500 text-slate-300 hover:text-white rounded-xl transition-all duration-200 cursor-pointer hover:scale-110 active:scale-90 shadow-sm hover:shadow-rose-500/30 border border-surface-700/80 hover:border-rose-400 flex items-center justify-center"
+                          title="Eliminar producto"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

@@ -94,8 +94,9 @@ export default function AdminPedidos() {
                           <option value="CANCELADO">CANCELADO</option>
                         </select>
                         <button
+                          type="button"
                           onClick={() => eliminar(pedido.id)}
-                          className="p-2 bg-rose-500/10 text-rose-500 rounded-lg hover:bg-rose-500 hover:text-white transition-colors cursor-pointer active:scale-95"
+                          className="p-2.5 bg-surface-800 hover:bg-rose-500 text-slate-300 hover:text-white rounded-xl transition-all duration-200 cursor-pointer hover:scale-110 active:scale-90 shadow-sm hover:shadow-rose-500/30 border border-surface-700/80 hover:border-rose-400 flex items-center justify-center shrink-0"
                           title="Eliminar pedido"
                         >
                           <Trash2 className="w-4 h-4" />

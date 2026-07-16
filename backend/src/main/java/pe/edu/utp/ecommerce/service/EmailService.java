@@ -64,6 +64,7 @@ public class EmailService {
     /**
      * 1. Correo de bienvenida (Registro de nuevo usuario)
      */
+    @Async
     public void enviarCorreoBienvenida(Usuario usuario) {
         String asunto = "Bienvenido a Servitek Perú";
         String cuerpo = String.format(
@@ -86,6 +87,7 @@ public class EmailService {
     /**
      * 2. Correo de recuperación de contraseña con código de 6 dígitos
      */
+    @Async
     public void enviarCorreoCodigoRecuperacion(Usuario usuario, String codigo) {
         String asunto = "Código de verificación de seguridad — Servitek Perú";
         String cuerpo = String.format(
@@ -102,6 +104,7 @@ public class EmailService {
     /**
      * 3. Correo de confirmación tras cambio exitoso de contraseña
      */
+    @Async
     public void enviarCorreoConfirmacionCambioPassword(Usuario usuario) {
         String asunto = "Tu contraseña ha sido actualizada — Servitek Perú";
         String cuerpo = String.format(
@@ -122,6 +125,7 @@ public class EmailService {
     /**
      * 4. Correo de confirmación de pedido (Detalle completo estilo Apple/Stripe)
      */
+    @Async
     public void enviarCorreoConfirmacionPedido(Pedido pedido, Usuario usuario) {
         String asunto = "Confirmación de pedido #" + pedido.getId() + " — Servitek Perú";
         
@@ -183,6 +187,7 @@ public class EmailService {
     /**
      * 5. Correo de actualización de estado de pedido
      */
+    @Async
     public void enviarCorreoActualizacionEstadoPedido(Pedido pedido, Usuario usuario, Pedido.Estado nuevoEstado) {
         String asunto = "Actualización de tu pedido #" + pedido.getId() + " — Servitek Perú";
         String descripcionEstado = obtenerDescripcionEstado(nuevoEstado);

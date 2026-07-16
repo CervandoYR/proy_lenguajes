@@ -4,6 +4,7 @@ export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:9001/ap
 
 const axiosClient = axios.create({
   baseURL: API_URL,
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json",
   },
