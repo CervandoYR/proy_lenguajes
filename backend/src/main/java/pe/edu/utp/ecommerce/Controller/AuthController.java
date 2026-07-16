@@ -35,6 +35,37 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private org.springframework.mail.javamail.JavaMailSender mailSender;
+
+    @GetMapping("/test-email")
+    public ResponseEntity<?> testEmail(@RequestParam(defaultValue = "yrcervando01@gmail.com") String to) {
+        java.util.Map<String, Object> resp = new java.util.HashMap<>();
+        if (mailSender == null) {
+            resp.put("error", "JavaMailSender es NULL. Verifica servitek.mail.enabled o la configuración de Spring.");
+            return ResponseEntity.badRequest().body(resp);
+        }
+        try {
+            org.springframework.mail.SimpleMailMessage msg = new org.springframework.mail.SimpleMailMessage();
+            msg.setFrom("Servitek Peru <yrcervando01@gmail.com>");
+            msg.setTo(to);
+            msg.setSubject("Prueba de Correo Servitek Railway");
+            msg.setText("Hola desde Railway. Si recibes esto, la configuración SMTP funciona perfectamente.");
+            mailSender.send(msg);
+            resp.put("exito", true);
+            resp.put("mensaje", "Correo enviado exitosamente a " + to);
+            return ResponseEntity.ok(resp);
+        } catch (Exception e) {
+            resp.put("exito", false);
+            resp.put("errorTipo", e.getClass().getName());
+            resp.put("errorMessage", e.getMessage());
+            java.io.StringWriter sw = new java.io.StringWriter();
+            e.printStackTrace(new java.io.PrintWriter(sw));
+            resp.put("stacktrace", sw.toString());
+            return ResponseEntity.badRequest().body(resp);
+        }
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
