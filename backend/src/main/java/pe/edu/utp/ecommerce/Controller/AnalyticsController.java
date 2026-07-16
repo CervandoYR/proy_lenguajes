@@ -37,7 +37,7 @@ public class AnalyticsController {
     @GetMapping("/low-stock")
     public ResponseEntity<List<Map<String, Object>>> getLowStock() {
         List<Producto> lowStockProducts = productoRepository.findAll().stream()
-                .filter(p -> p.getStock() < 5)
+                .filter(p -> p.getStock() <= 5)
                 .collect(Collectors.toList());
 
         List<Map<String, Object>> response = lowStockProducts.stream().map(p -> {
@@ -45,6 +45,9 @@ public class AnalyticsController {
             map.put("id", p.getId());
             map.put("nombre", p.getNombre());
             map.put("stock", p.getStock());
+            map.put("precio", p.getPrecio());
+            map.put("imagenUrl", p.getImagenUrl());
+            map.put("categoria", p.getCategoria() != null ? p.getCategoria().getNombre() : "Hardware");
             return map;
         }).collect(Collectors.toList());
 

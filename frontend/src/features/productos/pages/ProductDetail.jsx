@@ -1,12 +1,11 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import StoreLayout from "../../../layouts/StoreLayout";
 import ProductCard from "../components/ProductCard";
 import { getProductoById, getProductosPorCategoria } from "../productosService";
 import { useCart } from "../../carrito/CartContext";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
-import { ChevronRight, Home, ShoppingCart, ShieldCheck, Truck, Package, Box, ZoomIn, Info } from "lucide-react";
+import { ChevronRight, Home, ShoppingCart, ShieldCheck, Truck, Package, Box, ZoomIn, Info, Plus, Minus, AlertTriangle, CheckCircle2, AlertCircle } from "lucide-react";
 import '@google/model-viewer';
 
 export default function ProductDetail() {
@@ -14,6 +13,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recommended, setRecommended] = useState([]);
+  const [qty, setQty] = useState(1);
   
   // Media State
   const [allImages, setAllImages] = useState([]);
@@ -22,10 +22,12 @@ export default function ProductDetail() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const imgContainerRef = useRef(null);
 
-  const { addToCart } = useCart();
+  const { addToCart, items } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setQty(1);
     fetchData();
   }, [id]);
 
@@ -34,6 +36,7 @@ export default function ProductDetail() {
     try {
       const data = await getProductoById(id);
       setProduct(data);
+      setQty(1);
 
       // Process images
       let images = [];
@@ -50,7 +53,6 @@ export default function ProductDetail() {
       setActiveMediaIndex(0);
 
       if (data.categoria) {
-        // Fetch para recomendados de la misma categoria
         const recList = (await getProductosPorCategoria(data.categoria.id))
           .filter(p => p.id !== data.id)
           .slice(0, 4);
@@ -71,11 +73,16 @@ export default function ProductDetail() {
     setMousePos({ x, y });
   };
 
-  const navigate = useNavigate();
-
   const handleAddToCart = () => {
-    addToCart(product);
-    toast.success(`${product.nombre} agregado al carrito`, {
+    if (!product || product.stock === 0) return;
+    const existing = items.find(i => i.product.id === product.id);
+    const currentInCart = existing ? existing.quantity : 0;
+    if (currentInCart + qty > product.stock) {
+      toast.error(`Límite de inventario alcanzado (${product.stock} disponibles). Ya tienes ${currentInCart} unidades en tu carrito.`);
+      return;
+    }
+    addToCart(product, qty);
+    toast.success(`${qty}x ${product.nombre} agregado(s) al carrito`, {
       icon: <ShoppingCart className="w-4 h-4 text-brand-500" />,
       action: {
         label: "Ir a pagar →",
@@ -236,12 +243,48 @@ export default function ProductDetail() {
                 {product.descripcion || "Un componente esencial de alto rendimiento diseñado para maximizar tu productividad y llevar tu experiencia gaming al siguiente nivel."}
               </p>
 
-              <div className="flex items-end gap-4 mb-8">
-                <span className="text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-surface-400">
-                  S/ {Number(product.precio).toLocaleString("es-PE", { minimumFractionDigits: 2 })}
-                </span>
-                {product.stock > 0 && product.stock <= 5 && (
-                  <span className="text-amber-400 font-semibold mb-2">¡Solo quedan {product.stock}!</span>
+              <div className="flex flex-col gap-4 mb-8">
+                <div className="flex items-end gap-4">
+                  <span className="text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-surface-400">
+                    S/ {Number(product.precio).toLocaleString("es-PE", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+
+                {/* Barra y Alerta de Disponibilidad transaccional (Apple & Nielsen Heuristics) */}
+                {isOutOfStock ? (
+                  <div className="flex items-start gap-3 p-4 rounded-2xl bg-rose-950/30 border border-rose-500/30 text-rose-300">
+                    <AlertCircle className="w-5 h-5 shrink-0 text-rose-400 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-sm text-rose-200">Agotado Temporalmente</h4>
+                      <p className="text-xs text-rose-300/80 mt-0.5 leading-relaxed">
+                        Este componente se encuentra en proceso de reabastecimiento en nuestro almacén central. Pronto estará disponible con nuevas unidades.
+                      </p>
+                    </div>
+                  </div>
+                ) : product.stock <= 5 ? (
+                  <div className="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/30 space-y-2.5 shadow-lg shadow-amber-500/5">
+                    <div className="flex items-center justify-between text-xs font-bold text-amber-300">
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                        ⚡ ¡Atención! Stock crítico en almacén
+                      </span>
+                      <span>Quedan solo {product.stock} unid.</span>
+                    </div>
+                    <div className="w-full h-2 bg-surface-900 rounded-full overflow-hidden border border-amber-500/20">
+                      <div 
+                        className="h-full bg-gradient-to-r from-amber-500 to-rose-500 rounded-full transition-all duration-500" 
+                        style={{ width: `${Math.min(100, (product.stock / 5) * 100)}%` }}
+                      />
+                    </div>
+                    <p className="text-[11px] text-amber-300/80 leading-normal">
+                      Alta demanda actual. Te recomendamos asegurar tu orden antes de que se agoten las existencias.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold w-fit">
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+                    <span>En stock ({product.stock} disponibles) · Entrega exprés y garantía directa</span>
+                  </div>
                 )}
               </div>
 
@@ -280,14 +323,41 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              <button
-                onClick={handleAddToCart}
-                disabled={isOutOfStock}
-                className="w-full md:w-auto py-4 px-8 bg-brand-500 hover:bg-brand-400 text-white font-bold text-lg rounded-xl flex items-center justify-center gap-3 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1 hover:shadow-[0_0_20px_-5px_rgba(59,130,246,0.6)]"
-              >
-                <ShoppingCart className="w-6 h-6" />
-                {isOutOfStock ? "Agotado" : "Agregar al carrito"}
-              </button>
+              {/* Selector de Cantidad + Acción Principal */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                {!isOutOfStock && (
+                  <div className="flex items-center justify-between sm:justify-start bg-surface-900 border border-white/10 rounded-2xl p-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setQty(Math.max(1, qty - 1))}
+                      disabled={qty <= 1}
+                      className="w-11 h-11 rounded-xl bg-surface-800 hover:bg-surface-700 flex items-center justify-center text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer border-none"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <span className="w-14 text-center font-display font-bold text-lg text-white">
+                      {qty}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setQty(Math.min(product.stock, qty + 1))}
+                      disabled={qty >= product.stock}
+                      className="w-11 h-11 rounded-xl bg-surface-800 hover:bg-surface-700 flex items-center justify-center text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer border-none"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isOutOfStock}
+                  className="flex-1 py-4 px-8 bg-brand-500 hover:bg-brand-400 text-white font-bold text-lg rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1 hover:shadow-[0_0_25px_-5px_rgba(59,130,246,0.6)] active:scale-95 cursor-pointer border-none"
+                >
+                  <ShoppingCart className="w-6 h-6 shrink-0" />
+                  <span>{isOutOfStock ? "Agotado Temporalmente" : `Agregar al carrito (${qty})`}</span>
+                </button>
+              </div>
             </div>
           </div>
 

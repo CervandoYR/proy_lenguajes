@@ -59,6 +59,13 @@ public class PedidoService {
                 prod.setStock(prod.getStock() - detalle.getCantidad());
                 productoRepository.save(prod); // Esto actualiza la versión
 
+                // Alerta transaccional de stock bajo o agotado (Nielsen Heuristics & Apple Logística)
+                if (prod.getStock() <= 5) {
+                    try {
+                        emailService.enviarCorreoAlertaStock(prod);
+                    } catch (Exception ignored) {}
+                }
+
                 // ✅ REASIGNAR el producto recuperado al detalle (evita el problema de version null)
                 detalle.setProducto(prod);
 

@@ -454,11 +454,22 @@ export default function AdminProductos() {
                       S/ {Number(p.precio).toFixed(2)}
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className={`inline-flex items-center justify-center min-w-[2.5rem] px-2 py-1 rounded-lg text-xs font-bold ${
-                        p.stock > 10 ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"
-                      }`}>
-                        {p.stock}
-                      </span>
+                      {p.stock === 0 ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30 shadow-sm animate-pulse">
+                          <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                          Agotado (0)
+                        </span>
+                      ) : p.stock <= 5 ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-sm">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+                          Crítico ({p.stock})
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          Óptimo ({p.stock})
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${

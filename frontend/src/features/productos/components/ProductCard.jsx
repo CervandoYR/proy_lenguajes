@@ -56,16 +56,18 @@ export default function ProductCard({ product }) {
           </span>
         )}
 
-        {isLowStock && (
-          <span className="absolute top-3 right-3 bg-amber-500 text-slate-950 text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-md animate-pulse">
-            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-            <span>Últimos {product.stock}</span>
+        {isLowStock && !isOutOfStock && (
+          <span className="absolute top-3 right-3 bg-amber-500/90 backdrop-blur-md text-slate-950 text-[11px] font-black px-3 py-1 rounded-full flex items-center gap-1 shadow-lg shadow-amber-500/20 border border-amber-300 animate-pulse">
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0 fill-slate-950 text-slate-950" />
+            <span>⚡ ¡Solo {product.stock} unid.!</span>
           </span>
         )}
 
         {isOutOfStock && (
-          <div className="absolute inset-0 bg-surface-950/80 flex flex-col items-center justify-center backdrop-blur-sm p-4 text-center">
-            <span className="text-rose-400 font-bold text-sm bg-rose-500/10 border border-rose-500/20 px-4 py-1.5 rounded-xl">Agotado temporalmente</span>
+          <div className="absolute inset-0 bg-surface-950/85 flex flex-col items-center justify-center backdrop-blur-md p-4 text-center transition-all">
+            <span className="text-rose-400 font-extrabold text-xs tracking-wider uppercase bg-rose-500/15 border border-rose-500/30 px-4 py-2 rounded-full shadow-lg shadow-rose-500/10">
+              🔴 Agotado temporalmente
+            </span>
           </div>
         )}
       </Link>
@@ -108,6 +110,8 @@ export default function ProductCard({ product }) {
                 <Check className="w-4 h-4 shrink-0 stroke-[3]" />
                 <span>¡Añadido!</span>
               </>
+            ) : isOutOfStock ? (
+              <span>Sin stock</span>
             ) : (
               <>
                 <ShoppingCart className="w-4 h-4 shrink-0" />
