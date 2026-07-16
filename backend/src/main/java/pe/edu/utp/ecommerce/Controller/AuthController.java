@@ -38,11 +38,42 @@ public class AuthController {
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     private org.springframework.mail.javamail.JavaMailSender mailSender;
 
+    @org.springframework.beans.factory.annotation.Value("${brevo.api.key:${BREVO_API_KEY:}}")
+    private String brevoApiKey;
+
     @GetMapping("/test-email")
     public ResponseEntity<?> testEmail(@RequestParam(defaultValue = "yrcervando01@gmail.com") String to) {
         java.util.Map<String, Object> resp = new java.util.HashMap<>();
+        if (brevoApiKey != null && !brevoApiKey.trim().isEmpty()) {
+            try {
+                org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+                org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+                headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+                headers.set("api-key", brevoApiKey.trim());
+
+                java.util.Map<String, Object> body = new java.util.HashMap<>();
+                body.put("sender", java.util.Map.of("name", "Servitek Perú", "email", "yrcervando01@gmail.com"));
+                body.put("to", java.util.List.of(java.util.Map.of("email", to)));
+                body.put("subject", "Prueba Brevo HTTPS API - Servitek");
+                body.put("htmlContent", "<h3>Hola desde Railway (Brevo API)</h3><p>El envío por HTTPS API (Puerto 443) funciona perfectamente y se salta el bloqueo de puertos de Railway.</p>");
+
+                org.springframework.http.HttpEntity<java.util.Map<String, Object>> entity = new org.springframework.http.HttpEntity<>(body, headers);
+                org.springframework.http.ResponseEntity<String> res = restTemplate.postForEntity("https://api.brevo.com/v3/smtp/email", entity, String.class);
+                resp.put("exito", true);
+                resp.put("metodo", "Brevo HTTPS API (Port 443)");
+                resp.put("mensaje", "Correo enviado exitosamente a " + to);
+                resp.put("respuestaBrevo", res.getBody());
+                return ResponseEntity.ok(resp);
+            } catch (Exception e) {
+                resp.put("exito", false);
+                resp.put("metodo", "Brevo HTTPS API");
+                resp.put("errorMessage", e.getMessage());
+                return ResponseEntity.badRequest().body(resp);
+            }
+        }
+
         if (mailSender == null) {
-            resp.put("error", "JavaMailSender es NULL. Verifica servitek.mail.enabled o la configuración de Spring.");
+            resp.put("error", "JavaMailSender es NULL y no hay BREVO_API_KEY configurada.");
             return ResponseEntity.badRequest().body(resp);
         }
         try {
@@ -53,10 +84,12 @@ public class AuthController {
             msg.setText("Hola desde Railway. Si recibes esto, la configuración SMTP funciona perfectamente.");
             mailSender.send(msg);
             resp.put("exito", true);
+            resp.put("metodo", "SMTP JavaMailSender");
             resp.put("mensaje", "Correo enviado exitosamente a " + to);
             return ResponseEntity.ok(resp);
         } catch (Exception e) {
             resp.put("exito", false);
+            resp.put("metodo", "SMTP JavaMailSender");
             resp.put("errorTipo", e.getClass().getName());
             resp.put("errorMessage", e.getMessage());
             java.io.StringWriter sw = new java.io.StringWriter();

@@ -29,13 +29,48 @@ public class EmailService {
     @Value("${servitek.mail.from:Servitek Perú <notificaciones@servitek.pe>}")
     private String mailFrom;
 
+    @Value("${brevo.api.key:${BREVO_API_KEY:}}")
+    private String brevoApiKey;
+
+    private boolean enviarPorBrevoApi(String destinatario, String asunto, String contenidoHtml) {
+        try {
+            org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+            headers.set("api-key", brevoApiKey.trim());
+
+            String senderEmail = "yrcervando01@gmail.com";
+            String senderName = "Servitek Perú";
+            if (mailFrom != null && mailFrom.contains("<") && mailFrom.contains(">")) {
+                int start = mailFrom.indexOf('<');
+                int end = mailFrom.indexOf('>');
+                senderEmail = mailFrom.substring(start + 1, end).trim();
+                senderName = mailFrom.substring(0, start).trim();
+            }
+
+            java.util.Map<String, Object> body = new java.util.HashMap<>();
+            body.put("sender", java.util.Map.of("name", senderName, "email", senderEmail));
+            body.put("to", java.util.List.of(java.util.Map.of("email", destinatario)));
+            body.put("subject", asunto);
+            body.put("htmlContent", contenidoHtml);
+
+            org.springframework.http.HttpEntity<java.util.Map<String, Object>> entity = new org.springframework.http.HttpEntity<>(body, headers);
+            org.springframework.http.ResponseEntity<String> resp = restTemplate.postForEntity("https://api.brevo.com/v3/smtp/email", entity, String.class);
+            log.info("[Brevo API HTTPS] Correo enviado exitosamente a {} | status: {} | resp: {}", destinatario, resp.getStatusCode(), resp.getBody());
+            return true;
+        } catch (Exception e) {
+            log.error("[Brevo API HTTPS] Error enviando correo vía HTTPS a {}: {}", destinatario, e.getMessage(), e);
+            return false;
+        }
+    }
+
     /**
      * Envío asíncrono para no bloquear los flujos transaccionales de usuario o
      * pedido.
      */
     @Async
     public void enviarCorreo(String destinatario, String asunto, String contenidoHtml) {
-        if (!mailEnabled || mailSender == null) {
+        if (!mailEnabled && (brevoApiKey == null || brevoApiKey.trim().isEmpty())) {
             log.info("========================================================================================");
             log.info(
                     "[SIMULACIÓN CORREO - APPLE/NIELSEN UX] (Para activar SMTP real configura servitek.mail.enabled=true)");
@@ -44,6 +79,16 @@ public class EmailService {
             log.info("Asunto: {}", asunto);
             log.info("Contenido HTML:\n{}", contenidoHtml);
             log.info("========================================================================================");
+            return;
+        }
+
+        if (brevoApiKey != null && !brevoApiKey.trim().isEmpty()) {
+            boolean exito = enviarPorBrevoApi(destinatario, asunto, contenidoHtml);
+            if (exito) return;
+        }
+
+        if (mailSender == null) {
+            log.warn("JavaMailSender es null y no hay BREVO_API_KEY configurada.");
             return;
         }
 
