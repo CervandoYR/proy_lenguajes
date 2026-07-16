@@ -64,12 +64,19 @@ export default function ChatbotWidget() {
     }
   }
 
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent("chatbot-toggle", { detail: { isOpen } })
+    );
+  }, [isOpen]);
+
   if (!isOpen) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-brand-500 hover:bg-brand-600 rounded-full shadow-lg shadow-brand-500/30 flex items-center justify-center text-white transition-transform hover:scale-110 active:scale-95 cursor-pointer z-50 animate-bounce-subtle"
+        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 w-13 h-13 sm:w-14 sm:h-14 bg-brand-500 hover:bg-brand-600 rounded-full shadow-lg shadow-brand-500/30 flex items-center justify-center text-white transition-transform hover:scale-110 active:scale-95 cursor-pointer z-40 animate-bounce-subtle"
         title="Hablar con Servitek AI"
+        aria-label="Abrir asistente de Inteligencia Artificial Servitek AI"
       >
         <MessageSquare className="w-6 h-6" />
       </button>
@@ -77,9 +84,9 @@ export default function ChatbotWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-[92vw] sm:w-[410px] max-h-[82vh] bg-surface-900 border border-surface-700 shadow-2xl rounded-2xl overflow-hidden z-50 flex flex-col animate-in slide-in-from-bottom-5 duration-300">
+    <div className="fixed inset-x-0 bottom-0 sm:inset-auto sm:bottom-6 sm:right-6 w-full sm:w-[410px] max-h-[88vh] sm:max-h-[82vh] bg-surface-900 border-t sm:border border-surface-700 shadow-2xl rounded-t-3xl sm:rounded-2xl overflow-hidden z-50 flex flex-col animate-in slide-in-from-bottom-5 duration-300">
       {/* Header */}
-      <div className="bg-surface-800 px-4 py-3 border-b border-surface-700 flex items-center justify-between shrink-0">
+      <div className="bg-surface-800 px-5 py-3.5 border-b border-surface-700 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-brand-500/20 flex items-center justify-center shrink-0">
             <Bot className="w-4 h-4 text-brand-400" />
@@ -111,7 +118,7 @@ export default function ChatbotWidget() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 min-h-[360px] max-h-[460px] overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-surface-900/60 custom-scrollbar">
+      <div className="flex-1 min-h-[360px] max-h-[460px] sm:max-h-[440px] overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-surface-900/60 custom-scrollbar">
         {messages.map((m, i) => (
           <div key={i} className={`flex gap-2.5 ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
             <div className={`w-7 h-7 shrink-0 rounded-full flex items-center justify-center mt-0.5 ${m.role === "user" ? "bg-surface-800 border border-surface-700" : "bg-brand-500/20 border border-brand-500/30"}`}>

@@ -381,83 +381,125 @@ export default function Navbar({ onCartToggle }) {
             )}
 
             <button
-              className="md:hidden p-2.5 rounded-xl bg-surface-800 border border-surface-700 cursor-pointer active:scale-95"
+              className="md:hidden p-2.5 rounded-xl bg-surface-800 hover:bg-surface-700 border border-surface-700 cursor-pointer active:scale-95 transition-all"
               onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Abrir menú de navegación"
             >
               {mobileOpen ? (
-                <X className="w-5 h-5 text-slate-200" />
+                <X className="w-6 h-6 text-brand-400" />
               ) : (
-                <Menu className="w-5 h-5 text-slate-200" />
+                <Menu className="w-6 h-6 text-slate-200" />
               )}
             </button>
           </div>
         </div>
       </div>
 
+      {/* Menú Móvil Flotante (Apple Glassmorphism - No empuja la página hacia abajo) */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-surface-700/50 bg-surface-900 px-4 py-4 space-y-2">
-          <Link
-            to="/"
-            className="block px-4 py-2.5 rounded-lg text-sm text-surface-400 hover:text-slate-100 hover:bg-surface-800 no-underline"
-            onClick={() => setMobileOpen(false)}
-          >
-            Inicio
-          </Link>
-          <Link
-            to="/#catalogo"
-            className="block px-4 py-2.5 rounded-lg text-sm text-surface-400 hover:text-slate-100 hover:bg-surface-800 no-underline"
-            onClick={() => setMobileOpen(false)}
-          >
-            Catalogo
-          </Link>
-          {user ? (
-            <div className="space-y-1 pt-2 border-t border-surface-800/80">
-              <div className="px-4 py-1.5 text-[11px] font-bold text-surface-400 uppercase tracking-wider">
-                Cuenta ({user.nombre?.split(" ")[0]})
-              </div>
-              <Link
-                to={user.rol === "ADMIN" ? "/admin" : "/dashboard"}
-                className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-200 hover:text-brand-400 hover:bg-surface-800 no-underline"
-                onClick={() => setMobileOpen(false)}
-              >
-                <User className="w-4 h-4 text-brand-400" />
-                <span>Mi Cuenta</span>
-              </Link>
-              <Link
-                to={user.rol === "ADMIN" ? "/admin" : "/cuenta/ajustes?tab=inicio"}
-                className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-200 hover:text-emerald-400 hover:bg-surface-800 no-underline"
-                onClick={() => setMobileOpen(false)}
-              >
-                <Boxes className="w-4 h-4 text-emerald-400" />
-                <span>Mis Pedidos</span>
-              </Link>
-              <Link
-                to="/cuenta/ajustes?tab=datos"
-                className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-200 hover:text-amber-400 hover:bg-surface-800 no-underline"
-                onClick={() => setMobileOpen(false)}
-              >
-                <Settings className="w-4 h-4 text-amber-400" />
-                <span>Ajustes de mi Cuenta</span>
-              </Link>
-              <button
-                onClick={() => {
-                  setMobileOpen(false);
-                  handleLogout();
-                }}
-                className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-semibold text-rose-400 hover:bg-surface-800 cursor-pointer bg-transparent border-none text-left"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Cerrar Sesión</span>
-              </button>
-            </div>
-          ) : (
+        <div className="md:hidden absolute top-full left-0 w-full border-b border-surface-700 bg-surface-900/95 backdrop-blur-2xl shadow-2xl max-h-[85vh] overflow-y-auto px-5 py-6 space-y-5 z-50 animate-in slide-in-from-top-3 duration-200">
+          <div className="space-y-1">
             <Link
-              to="/login"
-              className="block px-4 py-2.5 rounded-lg text-sm text-brand-400 font-semibold hover:bg-surface-800 no-underline"
+              to="/"
+              className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:text-brand-400 hover:bg-surface-800 transition-all no-underline"
               onClick={() => setMobileOpen(false)}
             >
-              Ingresar
+              <span>Inicio</span>
             </Link>
+            <Link
+              to="/?categoria="
+              className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:text-brand-400 hover:bg-surface-800 transition-all no-underline"
+              onClick={() => setMobileOpen(false)}
+            >
+              <span>Catálogo Completo</span>
+            </Link>
+            <Link
+              to="/soporte"
+              className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:text-brand-400 hover:bg-surface-800 transition-all no-underline"
+              onClick={() => setMobileOpen(false)}
+            >
+              <span>Soporte & Asesoría VIP</span>
+            </Link>
+          </div>
+
+          <div className="space-y-2 pt-3 border-t border-surface-800">
+            <div className="px-4 text-[11px] font-bold text-surface-400 uppercase tracking-wider">
+              Categorías Rápidas
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { name: "Monitores", slug: "monitores" },
+                { name: "Laptops", slug: "laptops" },
+                { name: "Componentes", slug: "componentes" },
+                { name: "Almacenamiento", slug: "almacenamiento" },
+                { name: "Periféricos", slug: "perifericos" },
+                { name: "Redes", slug: "redes" }
+              ].map((cat) => (
+                <Link
+                  key={cat.slug}
+                  to={`/?categoria=${cat.slug}`}
+                  onClick={() => setMobileOpen(false)}
+                  className="px-3 py-2.5 rounded-xl bg-surface-800/80 hover:bg-brand-500/20 hover:text-brand-300 text-xs font-medium text-slate-300 text-center transition-all no-underline truncate border border-surface-700/50"
+                >
+                  {cat.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {user ? (
+            <div className="space-y-2 pt-4 border-t border-surface-800">
+              <div className="px-4 py-1 text-[11px] font-bold text-brand-400 uppercase tracking-wider">
+                Sesión: {user.nombre?.split(" ")[0]} ({user.rol})
+              </div>
+              <div className="space-y-1">
+                <Link
+                  to={user.rol === "ADMIN" ? "/admin" : "/dashboard"}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:text-brand-400 hover:bg-surface-800 transition-all no-underline"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <User className="w-4 h-4 text-brand-400" />
+                  <span>Mi Panel de Cuenta</span>
+                </Link>
+                <Link
+                  to={user.rol === "ADMIN" ? "/admin" : "/cuenta/ajustes?tab=inicio"}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:text-emerald-400 hover:bg-surface-800 transition-all no-underline"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <Boxes className="w-4 h-4 text-emerald-400" />
+                  <span>Mis Pedidos</span>
+                </Link>
+                <Link
+                  to="/cuenta/ajustes?tab=datos"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:text-amber-400 hover:bg-surface-800 transition-all no-underline"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <Settings className="w-4 h-4 text-amber-400" />
+                  <span>Ajustes de mi Cuenta</span>
+                </Link>
+                <button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-400 hover:bg-rose-500/15 transition-all cursor-pointer bg-transparent border-none text-left"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Cerrar Sesión</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="pt-4 border-t border-surface-800">
+              <Link
+                to="/login"
+                className="w-full py-3.5 px-4 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-500/30 no-underline active:scale-95"
+                onClick={() => setMobileOpen(false)}
+              >
+                <User className="w-4 h-4" />
+                <span>Ingresar / Crear Cuenta</span>
+              </Link>
+            </div>
           )}
         </div>
       )}
