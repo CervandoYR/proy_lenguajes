@@ -42,8 +42,8 @@ public class DataInitializer implements CommandLineRunner {
             jdbcTemplate.update("ALTER TABLE direcciones ADD COLUMN longitud DOUBLE");
             jdbcTemplate.update("ALTER TABLE direcciones ADD COLUMN referencia VARCHAR(255)");
         } catch (Exception ignored) {}
-        // Limpieza automática e integral de usuarios de prueba antiguos ("cervando" y "yactayocervando@gmail.com") y sus relaciones
-        for (String emailToDelete : java.util.List.of("cervando@servitek.pe", "yactayocervando@gmail.com")) {
+        // Limpieza automática e integral de usuarios de prueba antiguos ("cervando@servitek.pe") y sus relaciones
+        for (String emailToDelete : java.util.List.of("cervando@servitek.pe")) {
             usuarioRepository.findByEmail(emailToDelete).ifPresent(u -> {
                 try {
                     Long uid = u.getId();
