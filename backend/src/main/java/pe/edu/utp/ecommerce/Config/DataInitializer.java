@@ -42,15 +42,26 @@ public class DataInitializer implements CommandLineRunner {
             jdbcTemplate.update("ALTER TABLE direcciones ADD COLUMN longitud DOUBLE");
             jdbcTemplate.update("ALTER TABLE direcciones ADD COLUMN referencia VARCHAR(255)");
         } catch (Exception ignored) {}
-        // Limpieza automática de usuarios de prueba antiguos ("cervando" y "yactayocervando@gmail.com")
-        usuarioRepository.findByEmail("cervando@servitek.pe").ifPresent(u -> {
-            usuarioRepository.delete(u);
-            System.out.println("[Servitek] Usuario de prueba antiguo eliminado -> cervando@servitek.pe");
-        });
-        usuarioRepository.findByEmail("yactayocervando@gmail.com").ifPresent(u -> {
-            usuarioRepository.delete(u);
-            System.out.println("[Servitek] Usuario de prueba antiguo eliminado -> yactayocervando@gmail.com");
-        });
+        // Limpieza automática e integral de usuarios de prueba antiguos ("cervando" y "yactayocervando@gmail.com") y sus relaciones
+        for (String emailToDelete : java.util.List.of("cervando@servitek.pe", "yactayocervando@gmail.com")) {
+            usuarioRepository.findByEmail(emailToDelete).ifPresent(u -> {
+                try {
+                    Long uid = u.getId();
+                    try { jdbcTemplate.update("DELETE FROM items_carrito WHERE id_carrito IN (SELECT id_carrito FROM carritos WHERE id_usuario = ?)", uid); } catch (Exception ignored) {}
+                    try { jdbcTemplate.update("DELETE FROM carritos WHERE id_usuario = ?", uid); } catch (Exception ignored) {}
+                    try { jdbcTemplate.update("DELETE FROM detalle_pedidos WHERE id_pedido IN (SELECT id_pedido FROM pedidos WHERE id_usuario = ?)", uid); } catch (Exception ignored) {}
+                    try { jdbcTemplate.update("DELETE FROM pedidos WHERE id_usuario = ?", uid); } catch (Exception ignored) {}
+                    try { jdbcTemplate.update("DELETE FROM direcciones WHERE id_usuario = ?", uid); } catch (Exception ignored) {}
+                    try { jdbcTemplate.update("DELETE FROM valoraciones WHERE id_usuario = ?", uid); } catch (Exception ignored) {}
+                    try { jdbcTemplate.update("DELETE FROM notificaciones WHERE id_usuario = ?", uid); } catch (Exception ignored) {}
+                    try { jdbcTemplate.update("DELETE FROM tokens_recuperacion WHERE id_usuario = ?", uid); } catch (Exception ignored) {}
+                    usuarioRepository.delete(u);
+                    System.out.println("[Servitek] Usuario y sus dependencias eliminados exitosamente -> " + emailToDelete);
+                } catch (Exception e) {
+                    System.out.println("[Servitek] No se pudo eliminar el usuario " + emailToDelete + ": " + e.getMessage());
+                }
+            });
+        }
 
         if (usuarioRepository.findByEmail("admin@servitek.pe").isEmpty()) {
             Usuario admin = new Usuario();
