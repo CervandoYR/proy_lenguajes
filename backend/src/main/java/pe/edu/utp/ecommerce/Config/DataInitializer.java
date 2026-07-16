@@ -42,6 +42,20 @@ public class DataInitializer implements CommandLineRunner {
             jdbcTemplate.update("ALTER TABLE direcciones ADD COLUMN longitud DOUBLE");
             jdbcTemplate.update("ALTER TABLE direcciones ADD COLUMN referencia VARCHAR(255)");
         } catch (Exception ignored) {}
+
+        // Migración automática de datos del esquema 'dbEcommerce' al esquema 'railway' en producción para que el visor web de Railway muestre todo
+        try {
+            jdbcTemplate.update("INSERT IGNORE INTO usuarios (id_usuario, nombre, email, password_hash, rol, telefono, direccion, fecha_registro, activo) SELECT id_usuario, nombre, email, password_hash, rol, telefono, direccion, fecha_registro, activo FROM dbEcommerce.usuarios");
+            jdbcTemplate.update("INSERT IGNORE INTO categorias (id_categoria, nombre, descripcion, url_imagen, activo) SELECT id_categoria, nombre, descripcion, url_imagen, activo FROM dbEcommerce.categorias");
+            jdbcTemplate.update("INSERT IGNORE INTO productos SELECT * FROM dbEcommerce.productos");
+            jdbcTemplate.update("INSERT IGNORE INTO carritos SELECT * FROM dbEcommerce.carritos");
+            jdbcTemplate.update("INSERT IGNORE INTO items_carrito SELECT * FROM dbEcommerce.items_carrito");
+            jdbcTemplate.update("INSERT IGNORE INTO pedidos SELECT * FROM dbEcommerce.pedidos");
+            jdbcTemplate.update("INSERT IGNORE INTO detalle_pedidos SELECT * FROM dbEcommerce.detalle_pedidos");
+            jdbcTemplate.update("INSERT IGNORE INTO direcciones SELECT * FROM dbEcommerce.direcciones");
+            jdbcTemplate.update("INSERT IGNORE INTO valoraciones SELECT * FROM dbEcommerce.valoraciones");
+            System.out.println("[Servitek] Migración automática de datos de 'dbEcommerce' a 'railway' completada.");
+        } catch (Exception ignored) {}
         // Limpieza automática e integral de usuarios de prueba antiguos ("cervando@servitek.pe") y sus relaciones
         for (String emailToDelete : java.util.List.of("cervando@servitek.pe")) {
             usuarioRepository.findByEmail(emailToDelete).ifPresent(u -> {
