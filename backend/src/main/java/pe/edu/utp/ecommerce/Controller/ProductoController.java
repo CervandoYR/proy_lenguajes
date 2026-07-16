@@ -47,4 +47,11 @@ public class ProductoController {
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
+
+    @PatchMapping("/{id}/destacado")
+    public ResponseEntity<Producto> toggleDestacado(@PathVariable Long id) {
+        return service.toggleDestacado(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

@@ -9,12 +9,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.utp.ecommerce.DTO.AuthResponse;
+import pe.edu.utp.ecommerce.DTO.ForgotPasswordRequest;
 import pe.edu.utp.ecommerce.DTO.LoginRequest;
 import pe.edu.utp.ecommerce.DTO.RegisterRequest;
+import pe.edu.utp.ecommerce.DTO.ResetPasswordRequest;
 import pe.edu.utp.ecommerce.model.Usuario;
 import pe.edu.utp.ecommerce.repository.UsuarioRepository;
 import pe.edu.utp.ecommerce.security.CustomUserDetailsService;
 import pe.edu.utp.ecommerce.security.JwtUtil;
+import pe.edu.utp.ecommerce.service.EmailService;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -26,6 +33,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
@@ -60,6 +68,67 @@ public class AuthController {
 
         usuarioRepository.save(usuario);
 
+        // Enviar correo de bienvenida transaccional estilo Apple/Nielsen UX
+        try {
+            emailService.enviarCorreoBienvenida(usuario);
+        } catch (Exception ignored) {}
+
         return ResponseEntity.ok("Usuario registrado exitosamente");
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            return ResponseEntity.badRequest().body("Debes ingresar un correo electrónico válido.");
+        }
+
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(request.getEmail().trim());
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            // Generar código numérico de 6 dígitos
+            String codigo = String.format("%06d", new Random().nextInt(999999));
+            usuario.setCodigoRecuperacion(codigo);
+            usuario.setExpiracionCodigo(LocalDateTime.now().plusMinutes(15));
+            usuarioRepository.save(usuario);
+
+            try {
+                emailService.enviarCorreoCodigoRecuperacion(usuario, codigo);
+            } catch (Exception ignored) {}
+        }
+
+        // Devolvemos mensaje genérico para evitar enumeración de correos por motivos de privacidad
+        return ResponseEntity.ok("Si el correo está registrado en Servitek, recibirás un código de seguridad de 6 dígitos en unos momentos.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        if (request.getEmail() == null || request.getCodigo() == null || request.getNuevaPassword() == null) {
+            return ResponseEntity.badRequest().body("Todos los campos son obligatorios.");
+        }
+
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(request.getEmail().trim());
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body("Código de verificación o correo inválido.");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        if (usuario.getCodigoRecuperacion() == null || !usuario.getCodigoRecuperacion().equals(request.getCodigo().trim())) {
+            return ResponseEntity.badRequest().body("El código de verificación es incorrecto.");
+        }
+
+        if (usuario.getExpiracionCodigo() != null && LocalDateTime.now().isAfter(usuario.getExpiracionCodigo())) {
+            return ResponseEntity.badRequest().body("El código de verificación ha expirado. Solicita uno nuevo.");
+        }
+
+        usuario.setPasswordHash(passwordEncoder.encode(request.getNuevaPassword()));
+        usuario.setCodigoRecuperacion(null);
+        usuario.setExpiracionCodigo(null);
+        usuarioRepository.save(usuario);
+
+        try {
+            emailService.enviarCorreoConfirmacionCambioPassword(usuario);
+        } catch (Exception ignored) {}
+
+        return ResponseEntity.ok("Contraseña actualizada correctamente. Ya puedes iniciar sesión con tu nueva clave.");
     }
 }

@@ -38,6 +38,12 @@ public class Usuario {
     @Column(nullable = false)
     private Boolean activo = true;
 
+    @Column(name = "codigo_recuperacion", length = 10)
+    private String codigoRecuperacion;
+
+    @Column(name = "expiracion_codigo")
+    private LocalDateTime expiracionCodigo;
+
     @Column(name = "fecha_registro", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaRegistro;
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Upload, Search, PackageOpen, Image as ImageIcon, Box, List as ListIcon, Info, X, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, Upload, Search, PackageOpen, Image as ImageIcon, Box, List as ListIcon, Info, X, Eye, Sparkles } from "lucide-react";
 import AdminLayout from "../../../../layouts/AdminLayout";
 import { createProducto, updateProducto, uploadMedia } from "../../productosService";
 import { useProductosAdmin } from "../../useProductos";
@@ -18,6 +18,7 @@ function ProductoModal({ categorias, producto, onClose, onSaved }) {
     especificaciones: "{}",
     modelo3dUrl: "",
     activo: true,
+    destacado: false,
   });
 
   const [archivo, setArchivo] = useState(null);
@@ -44,6 +45,7 @@ function ProductoModal({ categorias, producto, onClose, onSaved }) {
       especificaciones: producto?.especificaciones ?? "{}",
       modelo3dUrl: producto?.modelo3dUrl ?? "",
       activo: producto?.activo ?? true,
+      destacado: producto?.destacado ?? false,
     });
 
     try {
@@ -182,6 +184,22 @@ function ProductoModal({ categorias, producto, onClose, onSaved }) {
                       <option value="false">Inactivo</option>
                     </select>
                   </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-surface-800/80 border border-surface-700 rounded-xl hover:border-brand-500/50 transition-colors">
+                  <div>
+                    <label className="text-sm font-medium text-slate-200 block flex items-center gap-1.5 cursor-pointer" onClick={() => setForm({ ...form, destacado: !form.destacado })}>
+                      <Sparkles className="w-4 h-4 text-brand-400" />
+                      Destacado en Oferta (Carrusel Principal)
+                    </label>
+                    <span className="text-xs text-surface-400">Si se activa, el producto aparecerá en el carrusel "Equipos Destacados en Oferta" de la tienda</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={form.destacado || false}
+                    onChange={(e) => setForm({ ...form, destacado: e.target.checked })}
+                    className="w-5 h-5 accent-brand-500 rounded cursor-pointer shrink-0"
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -349,7 +367,7 @@ function ProductoModal({ categorias, producto, onClose, onSaved }) {
 }
 
 export default function AdminProductos() {
-  const { productos, categorias, loading, recargar, eliminarProducto } = useProductosAdmin();
+  const { productos, categorias, loading, recargar, eliminarProducto, toggleDestacado } = useProductosAdmin();
   const [busqueda, setBusqueda] = useState("");
   const [modal, setModal] = useState(false);
   const [editando, setEditando] = useState(null);
@@ -411,6 +429,7 @@ export default function AdminProductos() {
                   <th className="px-6 py-4 font-semibold text-right">Precio</th>
                   <th className="px-6 py-4 font-semibold text-center">Stock</th>
                   <th className="px-6 py-4 font-semibold text-center">Estado</th>
+                  <th className="px-6 py-4 font-semibold text-center">En Oferta</th>
                   <th className="px-6 py-4 font-semibold text-right">Acciones</th>
                 </tr>
               </thead>
@@ -447,6 +466,21 @@ export default function AdminProductos() {
                       }`}>
                         {p.activo ? "Activo" : "Inactivo"}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        type="button"
+                        onClick={() => toggleDestacado(p.id)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all ${
+                          p.destacado
+                            ? "bg-brand-500/20 text-brand-400 border border-brand-500/40 hover:bg-brand-500/30 shadow-sm"
+                            : "bg-surface-700 text-surface-400 border border-surface-600 hover:bg-surface-600 hover:text-surface-200"
+                        }`}
+                        title="Click para agregar o quitar del carrusel de ofertas"
+                      >
+                        <Sparkles className={`w-3.5 h-3.5 ${p.destacado ? "text-brand-400 fill-brand-400" : ""}`} />
+                        {p.destacado ? "En Oferta" : "Normal"}
+                      </button>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">

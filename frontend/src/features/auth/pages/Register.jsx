@@ -40,10 +40,10 @@ export default function Register() {
           <span>Volver a la tienda</span>
         </Link>
 
-        <div className="bg-surface-900 border border-surface-800 rounded-3xl overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-12">
+        <div className="bg-surface-900 border border-surface-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:grid md:grid-cols-12">
           
           {/* Left Panel - Value Proposition & Progressive Disclosure Info */}
-          <div className="md:col-span-5 bg-gradient-to-br from-surface-950/90 to-surface-900 p-8 sm:p-10 border-b md:border-b-0 md:border-r border-surface-800 flex flex-col justify-between">
+          <div className="order-2 md:order-1 md:col-span-5 bg-gradient-to-br from-surface-950/90 to-surface-900 p-8 sm:p-10 border-t md:border-t-0 md:border-r border-surface-800 flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-11 h-11 bg-brand-500 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-500/25 border border-brand-400/30">
@@ -102,7 +102,7 @@ export default function Register() {
           </div>
 
           {/* Right Panel - Register Form */}
-          <div className="md:col-span-7 p-8 sm:p-10 flex flex-col justify-center bg-surface-900">
+          <div className="order-1 md:order-2 md:col-span-7 p-8 sm:p-10 flex flex-col justify-center bg-surface-900">
             <h2 className="text-2xl sm:text-3xl font-display font-bold text-white tracking-tight mb-2">
               Registrar Nueva Cuenta
             </h2>

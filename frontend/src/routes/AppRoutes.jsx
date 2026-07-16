@@ -4,6 +4,7 @@ import PrivateRoute from "./PrivateRoute";
 import StorePage from "../features/tienda/pages/StorePage";
 import Login from "../features/auth/pages/Login";
 import Register from "../features/auth/pages/Register";
+import ForgotPassword from "../features/auth/pages/ForgotPassword";
 import ProductDetail from "../features/productos/pages/ProductDetail";
 import ClienteDashboard from "../features/dashboard-cliente/pages/Dashboard";
 import AccountSettingsPage from "../features/dashboard-cliente/pages/AccountSettingsPage";
@@ -24,6 +25,7 @@ export default function AppRoutes() {
       <Route path="/" element={<StorePage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/recuperar-password" element={<ForgotPassword />} />
       <Route path="/quienes-somos" element={<AboutUs />} />
       <Route path="/soporte" element={<Support />} />
       <Route path="/producto/:id/:slug?" element={<ProductDetail />} />

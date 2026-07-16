@@ -9,6 +9,9 @@ export default function FeaturedCarousel({ products }) {
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
+  const destacados = products?.filter((p) => p.destacado === true) || [];
+  const productosAmostrar = destacados.length > 0 ? destacados : (products?.slice(0, 6) || []);
+
   const scroll = (direction) => {
     if (scrollRef.current) {
       const { scrollLeft, clientWidth } = scrollRef.current;
@@ -27,6 +30,8 @@ export default function FeaturedCarousel({ products }) {
       duration: 4000,
     });
   };
+
+  if (!productosAmostrar || productosAmostrar.length === 0) return null;
 
   return (
     <div className="py-20 bg-surface-900 border-b border-surface-800 relative select-none">
@@ -69,7 +74,7 @@ export default function FeaturedCarousel({ products }) {
           className="flex gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-8 px-6 lg:px-16 xl:px-24 w-full scroll-smooth"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {products.slice(0, 6).map((producto) => {
+          {productosAmostrar.map((producto) => {
             const slug = producto.nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
             const productUrl = `/producto/${producto.id}/${slug}`;
             

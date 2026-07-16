@@ -40,6 +40,8 @@ public class ProductoService {
         p.setImagenesAdicionales(dto.imagenesAdicionales);
         p.setEspecificaciones(dto.especificaciones);
         p.setModelo3dUrl(dto.modelo3dUrl);
+        if (dto.activo != null) p.setActivo(dto.activo);
+        if (dto.destacado != null) p.setDestacado(dto.destacado);
 
         return repository.save(p);
     }
@@ -62,7 +64,17 @@ public class ProductoService {
             if (dto.imagenesAdicionales != null) p.setImagenesAdicionales(dto.imagenesAdicionales);
             if (dto.especificaciones != null) p.setEspecificaciones(dto.especificaciones);
             if (dto.modelo3dUrl != null) p.setModelo3dUrl(dto.modelo3dUrl);
+            if (dto.activo != null) p.setActivo(dto.activo);
+            if (dto.destacado != null) p.setDestacado(dto.destacado);
 
+            return repository.save(p);
+        });
+    }
+
+    public Optional<Producto> toggleDestacado(Long id) {
+        return repository.findById(id).map(p -> {
+            boolean actual = p.getDestacado() != null && p.getDestacado();
+            p.setDestacado(!actual);
             return repository.save(p);
         });
     }

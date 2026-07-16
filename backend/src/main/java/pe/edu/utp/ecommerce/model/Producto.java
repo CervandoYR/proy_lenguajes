@@ -45,6 +45,13 @@ public class Producto {
     @Column(nullable = false)
     private Boolean activo = true;
 
+    @Column(name = "destacado")
+    private Boolean destacado = false;
+
+    public Boolean getDestacado() {
+        return destacado != null && destacado;
+    }
+
     @Column(name = "fecha_creacion", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaCreacion;
 
@@ -64,6 +71,7 @@ public class Producto {
         this.precio = precio;
         this.stock = stock;
         this.activo = true;
+        this.destacado = false;
         this.fechaCreacion = LocalDateTime.now();
     }
 

@@ -9,6 +9,7 @@ import pe.edu.utp.ecommerce.model.Producto;
 import pe.edu.utp.ecommerce.model.Usuario;
 import pe.edu.utp.ecommerce.repository.PedidoRepository;
 import pe.edu.utp.ecommerce.repository.ProductoRepository;
+import pe.edu.utp.ecommerce.service.EmailService;
 
 
 import java.math.BigDecimal;
@@ -21,6 +22,7 @@ public class PedidoService {
 
     private final PedidoRepository repository;
     private final ProductoRepository productoRepository;
+    private final EmailService emailService;
 
     public List<Pedido> listarTodos() {
         return repository.findAll();
@@ -75,13 +77,26 @@ public class PedidoService {
         }
 
         // Guardar el pedido (cascada guardará los detalles)
-        return repository.save(pedido);
+        Pedido guardado = repository.save(pedido);
+
+        // Enviar correo de confirmación de pedido transaccional estilo Apple/Stripe
+        try {
+            emailService.enviarCorreoConfirmacionPedido(guardado, guardado.getUsuario());
+        } catch (Exception ignored) {}
+
+        return guardado;
     }
 
     public Optional<Pedido> actualizarEstado(Long id, Pedido.Estado nuevoEstado) {
         return repository.findById(id).map(p -> {
             p.setEstado(nuevoEstado);
-            return repository.save(p);
+            Pedido actualizado = repository.save(p);
+            try {
+                if (actualizado.getUsuario() != null) {
+                    emailService.enviarCorreoActualizacionEstadoPedido(actualizado, actualizado.getUsuario(), nuevoEstado);
+                }
+            } catch (Exception ignored) {}
+            return actualizado;
         });
     }
 

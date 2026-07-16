@@ -12,4 +12,6 @@ public class ProductoDTO {
     public String imagenesAdicionales;
     public String especificaciones;
     public String modelo3dUrl;
+    public Boolean activo;
+    public Boolean destacado;
 }

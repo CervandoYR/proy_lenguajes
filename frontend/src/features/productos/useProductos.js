@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { getProductos, deleteProducto } from "./productosService";
+import { getProductos, deleteProducto, toggleDestacadoProducto } from "./productosService";
 import { getCategorias } from "../categorias/categoriasService";
 
 /**
@@ -42,7 +42,17 @@ export function useProductosAdmin() {
     }
   };
 
-  return { productos, categorias, loading, recargar: cargar, eliminarProducto };
+  const toggleDestacado = async (id) => {
+    try {
+      await toggleDestacadoProducto(id);
+      toast.success("Estado de oferta en carrusel actualizado");
+      cargar();
+    } catch (err) {
+      toast.error("Error al actualizar estado en carrusel");
+    }
+  };
+
+  return { productos, categorias, loading, recargar: cargar, eliminarProducto, toggleDestacado };
 }
 
 /** Hook para el catalogo publico (tienda) */

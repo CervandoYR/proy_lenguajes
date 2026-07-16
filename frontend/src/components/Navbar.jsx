@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, LogOut, Search, ChevronDown, LayoutGrid, Cpu, UserCheck, Boxes, Settings } from "lucide-react";
+import { ShoppingCart, User, Menu, X, LogOut, Search, ChevronDown, LayoutGrid, Cpu, UserCheck, Boxes, Settings, ShieldCheck, Headphones } from "lucide-react";
 import { useCart } from "../features/carrito/CartContext";
 import useAuthStore from "../features/auth/authStore";
 import { getCategorias } from "../features/categorias/categoriasService";
@@ -445,6 +445,28 @@ export default function Navbar({ onCartToggle }) {
                 </Link>
               ))}
             </div>
+          </div>
+
+          <div className="pt-4 border-t border-surface-800 space-y-1">
+            <div className="px-4 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              Servitek Oficial
+            </div>
+            <Link
+              to="/quienes-somos"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:text-brand-400 hover:bg-surface-800 transition-all no-underline"
+            >
+              <ShieldCheck className="w-4 h-4 text-brand-400" />
+              <span>Confianza & Respaldo</span>
+            </Link>
+            <Link
+              to="/soporte"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:text-brand-400 hover:bg-surface-800 transition-all no-underline"
+            >
+              <Headphones className="w-4 h-4 text-brand-400" />
+              <span>Ayuda & Soporte Técnico</span>
+            </Link>
           </div>
 
           {user ? (

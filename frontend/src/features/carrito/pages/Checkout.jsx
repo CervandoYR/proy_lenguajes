@@ -19,9 +19,11 @@ import {
   MapPin,
   ArrowRight,
   ShoppingBag,
-  Phone,
   Mail,
-  User
+  User,
+  Plus,
+  Minus,
+  Trash2
 } from "lucide-react";
 
 // Helper para cálculo dinámico real de envío según la dirección y zona del cliente
@@ -68,7 +70,7 @@ const calculateShippingInfo = (dir) => {
 };
 
 export default function Checkout() {
-  const { items, cartTotal, clearCart } = useCart();
+  const { items, cartTotal, clearCart, updateQuantity, removeFromCart } = useCart();
   const { isAuthenticated, user } = useAuthStore();
   const navigate = useNavigate();
 
@@ -367,13 +369,49 @@ export default function Checkout() {
                         <h4 className="text-slate-100 font-display font-bold text-base leading-snug truncate">
                           {product.nombre}
                         </h4>
-                        <div className="flex items-center gap-3 mt-2">
-                          <span className="text-xs font-mono font-bold text-surface-300 bg-surface-950 border border-surface-800 px-2.5 py-1 rounded-lg">
-                            ×{quantity} {quantity === 1 ? "unidad" : "unidades"}
-                          </span>
+                        {/* Controles de Cantidad y Eliminación (Apple / Nielsen UX) */}
+                        <div className="flex flex-wrap items-center gap-3 mt-2.5">
+                          <div className="inline-flex items-center bg-surface-950 border border-surface-800 rounded-xl p-0.5 shadow-inner">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (quantity <= 1) {
+                                  removeFromCart(product.id);
+                                } else {
+                                  updateQuantity(product.id, quantity - 1);
+                                }
+                              }}
+                              className="w-7 h-7 flex items-center justify-center text-surface-400 hover:text-slate-100 hover:bg-surface-800 rounded-lg transition-colors cursor-pointer bg-transparent border-none"
+                              title={quantity <= 1 ? "Eliminar ítem" : "Disminuir cantidad"}
+                            >
+                              {quantity <= 1 ? <Trash2 className="w-3.5 h-3.5 text-rose-400" /> : <Minus className="w-3.5 h-3.5" />}
+                            </button>
+                            <span className="w-8 text-center text-xs font-mono font-bold text-slate-200">
+                              {quantity}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(product.id, quantity + 1)}
+                              disabled={quantity >= product.stock}
+                              className="w-7 h-7 flex items-center justify-center text-surface-400 hover:text-slate-100 hover:bg-surface-800 rounded-lg transition-colors cursor-pointer bg-transparent border-none disabled:opacity-30 disabled:cursor-not-allowed"
+                              title="Aumentar cantidad"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+
                           <span className="text-xs font-mono text-surface-500">
                             S/ {product.precio.toFixed(2)} c/u
                           </span>
+
+                          <button
+                            type="button"
+                            onClick={() => removeFromCart(product.id)}
+                            className="p-1.5 text-surface-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all cursor-pointer bg-transparent border-none flex items-center justify-center"
+                            title="Eliminar de la orden"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
 

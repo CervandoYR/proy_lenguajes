@@ -18,6 +18,9 @@ export const updateProducto = (id, payload) =>
 export const deleteProducto = (id) =>
   axiosClient.delete(`/productos/${id}`).then((r) => r.data);
 
+export const toggleDestacadoProducto = (id) =>
+  axiosClient.patch(`/productos/${id}/destacado`).then((r) => r.data);
+
 export const uploadMedia = (formData) =>
   axiosClient
     .post("/media/upload", formData, {
