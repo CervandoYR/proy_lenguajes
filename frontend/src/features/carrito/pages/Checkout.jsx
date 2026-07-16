@@ -349,27 +349,35 @@ export default function Checkout() {
                 <div className="divide-y divide-surface-800/60 max-h-[420px] overflow-y-auto custom-scrollbar">
                   {items.map(({ product, quantity }) => (
                     <div key={product.id} className="p-6 flex items-center gap-5 group hover:bg-surface-950/40 transition-colors">
-                      {/* Miniatura de hardware con marco técnico */}
-                      <div className="w-[76px] h-[76px] rounded-2xl bg-surface-950 border border-surface-800 flex items-center justify-center shrink-0 overflow-hidden p-2.5 group-hover:border-brand-500/30 transition-colors shadow-inner">
+                      {/* Miniatura de hardware con marco técnico clickeable */}
+                      <Link
+                        to={`/producto/${product.id}/${product.nombre?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'item'}`}
+                        className="w-[76px] h-[76px] rounded-2xl bg-surface-950 border border-surface-800 flex items-center justify-center shrink-0 overflow-hidden p-2.5 group-hover:border-brand-500/50 transition-all shadow-inner cursor-pointer"
+                        title="Ver ficha técnica del producto"
+                      >
                         {product.imagenUrl ? (
                           <img
                             src={product.imagenUrl}
                             alt={product.nombre}
-                            className="w-full h-full object-contain mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-300"
+                            className="w-full h-full object-contain mix-blend-luminosity group-hover:mix-blend-normal group-hover:scale-105 transition-all duration-300"
                           />
                         ) : (
                           <Package className="w-8 h-8 text-surface-600" />
                         )}
-                      </div>
+                      </Link>
 
                       {/* Información técnica del ítem */}
                       <div className="flex-1 min-w-0">
                         <span className="inline-block text-[10px] font-mono font-bold tracking-wider uppercase text-brand-400/90 bg-brand-500/10 border border-brand-500/20 px-2 py-0.5 rounded mb-1.5">
-                          [ HARDWARE SPEC ]
+                          [ {product.categoria?.nombre || product.categoria || "HARDWARE TECH"} ]
                         </span>
-                        <h4 className="text-slate-100 font-display font-bold text-base leading-snug truncate">
+                        <Link
+                          to={`/producto/${product.id}/${product.nombre?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'item'}`}
+                          className="block text-slate-100 hover:text-brand-400 transition-colors font-display font-bold text-base leading-snug truncate"
+                          title="Volver a la ficha de este producto"
+                        >
                           {product.nombre}
-                        </h4>
+                        </Link>
                         {/* Controles de Cantidad y Eliminación (Apple / Nielsen UX) */}
                         <div className="flex flex-wrap items-center gap-3 mt-2.5">
                           <div className="inline-flex items-center bg-surface-950 border border-surface-800 rounded-xl p-0.5 shadow-inner">
@@ -779,6 +787,39 @@ export default function Checkout() {
                             </p>
                           )}
                         </div>
+                      </div>
+                    )}
+
+                    {/* Alerta dinámica y clara del porqué no está habilitado el botón de pagar (Apple / Nielsen UX) */}
+                    {(!hasAddress || !cardForm.cardNumber || !cardForm.cvv) && txState.status !== "PROCESSING" && (
+                      <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 animate-in fade-in duration-300 shadow-inner">
+                        <div className="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider mb-2.5">
+                          <AlertCircle className="w-4 h-4 shrink-0 text-amber-400" />
+                          <span>Para habilitar el pago, completa lo siguiente:</span>
+                        </div>
+                        <ul className="space-y-2 text-xs font-mono text-amber-200/90 pl-1">
+                          {!hasAddress && (
+                            <li className="flex items-center justify-between gap-2 bg-amber-500/10 px-3 py-2 rounded-lg border border-amber-500/20">
+                              <span className="flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
+                                <span>Registrar dirección de envío en el mapa</span>
+                              </span>
+                              <button
+                                type="button"
+                                onClick={handleAddressAction}
+                                className="text-amber-400 font-bold hover:underline cursor-pointer shrink-0 ml-2 bg-surface-950/60 px-2 py-1 rounded"
+                              >
+                                Configurar →
+                              </button>
+                            </li>
+                          )}
+                          {(!cardForm.cardNumber || !cardForm.cvv) && (
+                            <li className="flex items-center gap-2 bg-amber-500/10 px-3 py-2 rounded-lg border border-amber-500/20">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
+                              <span>Ingresar tarjeta o seleccionar una del modo Sandbox arriba</span>
+                            </li>
+                          )}
+                        </ul>
                       </div>
                     )}
 
