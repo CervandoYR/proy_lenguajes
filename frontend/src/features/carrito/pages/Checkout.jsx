@@ -19,6 +19,7 @@ import {
   MapPin,
   ArrowRight,
   ShoppingBag,
+  Phone,
   Mail,
   User,
   Plus,
