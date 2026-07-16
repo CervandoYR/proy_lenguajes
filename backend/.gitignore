@@ -32,6 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-### Secrets & Configurations ###
-application.properties
-application-*.properties
+### Local Secrets (Never commit to Git) ###
+application-local.properties
+application-dev.properties
