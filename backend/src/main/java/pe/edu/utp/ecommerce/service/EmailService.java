@@ -29,6 +29,9 @@ public class EmailService {
     @Value("${servitek.mail.from:Servitek Perú <notificaciones@servitek.pe>}")
     private String mailFrom;
 
+    @Value("${servitek.frontend.url:${FRONTEND_URL:https://proy-lenguajes.vercel.app}}")
+    private String frontendUrl;
+
     @Value("${brevo.api.key:${BREVO_API_KEY:}}")
     private String brevoApiKey;
 
@@ -141,9 +144,9 @@ public class EmailService {
                         "<p style='margin-top: 24px;'>Si necesitas asesoría para elegir tu equipo o componente, nuestro equipo de soporte técnico está disponible para ayudarte de forma directa.</p>"
                         +
                         "<div style='margin-top: 32px; text-align: center;'>" +
-                        "  <a href='http://localhost:5173/login' class='btn'>Iniciar sesión</a>" +
+                        "  <a href='%s/login' class='btn'>Iniciar sesión</a>" +
                         "</div>",
-                usuario.getNombre(), usuario.getEmail());
+                usuario.getNombre(), usuario.getEmail(), frontendUrl);
         enviarCorreo(usuario.getEmail(), asunto, envolverPlantilla("Bienvenido a Servitek", cuerpo));
     }
 
@@ -273,7 +276,7 @@ public class EmailService {
                         "<p style='margin-top: 24px;'>Si tienes alguna pregunta sobre el transporte o la entrega de tu equipo, contáctanos respondiendo a este mensaje o vía WhatsApp técnico.</p>"
                         +
                         "<div style='margin-top: 32px; text-align: center;'>" +
-                        "  <a href='http://localhost:5173/dashboard' class='btn'>Ver seguimiento y estado en vivo →</a>"
+                        "  <a href='%s/dashboard' class='btn'>Ver seguimiento y estado en vivo →</a>"
                         +
                         "</div>",
                 usuario.getNombre(),
@@ -281,7 +284,8 @@ public class EmailService {
                 nuevoEstado.name(),
                 descripcionEstado,
                 construirLineaTiempo(nuevoEstado),
-                obtenerDireccionTexto(pedido, usuario));
+                obtenerDireccionTexto(pedido, usuario),
+                frontendUrl);
         enviarCorreo(usuario.getEmail(), asunto, envolverPlantilla("Estado de Orden #" + pedido.getId(), cuerpo));
     }
 
@@ -507,12 +511,13 @@ public class EmailService {
                 "</div>" +
                 "<p style='margin-top: 24px;'>Te recomendamos reabastecer las unidades de inmediato en el panel administrativo para evitar interrupciones en el flujo de compras de los usuarios.</p>" +
                 "<div style='margin-top: 32px; text-align: center;'>" +
-                "  <a href='http://localhost:5173/admin/productos' class='btn'>Ir al Panel de Gestión de Productos →</a>" +
+                "  <a href='%s/admin/productos' class='btn'>Ir al Panel de Gestión de Productos →</a>" +
                 "</div>",
                 badgeColor, badgeBg, badgeColor, badgeColor, badgeText,
                 producto.getNombre(), producto.getId(),
                 badgeColor, producto.getStock(),
-                producto.getCategoria() != null ? producto.getCategoria().getNombre() : "Hardware general"
+                producto.getCategoria() != null ? producto.getCategoria().getNombre() : "Hardware general",
+                frontendUrl
         );
 
         String adminEmail = (mailFrom != null && mailFrom.contains("<") && mailFrom.contains(">"))
