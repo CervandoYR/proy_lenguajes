@@ -42,6 +42,16 @@ public class DataInitializer implements CommandLineRunner {
             jdbcTemplate.update("ALTER TABLE direcciones ADD COLUMN longitud DOUBLE");
             jdbcTemplate.update("ALTER TABLE direcciones ADD COLUMN referencia VARCHAR(255)");
         } catch (Exception ignored) {}
+        // Limpieza automática de usuarios de prueba antiguos ("cervando" y "yactayocervando@gmail.com")
+        usuarioRepository.findByEmail("cervando@servitek.pe").ifPresent(u -> {
+            usuarioRepository.delete(u);
+            System.out.println("[Servitek] Usuario de prueba antiguo eliminado -> cervando@servitek.pe");
+        });
+        usuarioRepository.findByEmail("yactayocervando@gmail.com").ifPresent(u -> {
+            usuarioRepository.delete(u);
+            System.out.println("[Servitek] Usuario de prueba antiguo eliminado -> yactayocervando@gmail.com");
+        });
+
         if (usuarioRepository.findByEmail("admin@servitek.pe").isEmpty()) {
             Usuario admin = new Usuario();
             admin.setNombre("Administrador Servitek");
