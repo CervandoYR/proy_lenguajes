@@ -26,6 +26,10 @@ public class ProductoService {
         return repository.findById(id);
     }
 
+    public List<Producto> buscarPorCategoria(Long categoriaId) {
+        return repository.findByCategoriaId(categoriaId);
+    }
+
     public Producto guardar(ProductoDTO dto) {
         Categoria cat = categoriaRepository.findById(dto.categoriaId)
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));

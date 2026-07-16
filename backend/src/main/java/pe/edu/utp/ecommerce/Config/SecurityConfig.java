@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/productos/**", "/api/categorias/**").permitAll()
-                        .requestMatchers("/api/chat/**").permitAll()
+                        .requestMatchers("/api/chat/**", "/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/pagos/procesar").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/pedidos").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/pedidos/mis-pedidos").authenticated()

@@ -23,6 +23,7 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<StorePage />} />
+      <Route path="/productos" element={<StorePage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/recuperar-password" element={<ForgotPassword />} />

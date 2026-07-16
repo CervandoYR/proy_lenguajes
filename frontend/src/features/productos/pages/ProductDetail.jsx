@@ -135,10 +135,10 @@ export default function ProductDetail() {
               Inicio
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <Link to="/productos" className="hover:text-brand-400 cursor-pointer transition-colors">Productos</Link>
+            <Link to="/?categoria=#catalogo" className="hover:text-brand-400 cursor-pointer transition-colors">Productos</Link>
             <ChevronRight className="w-4 h-4" />
             <Link 
-              to={product.categoria?.id ? `/productos?categoria=${product.categoria.id}` : "/productos"} 
+              to={product.categoria ? `/?categoria=${product.categoria.slug || product.categoria.id}#catalogo` : "/?categoria=#catalogo"} 
               className="hover:text-brand-400 cursor-pointer transition-colors"
             >
               {product.categoria?.nombre || "Hardware"}

@@ -28,6 +28,11 @@ public class ProductoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/categoria/{id}")
+    public List<Producto> buscarPorCategoria(@PathVariable Long id) {
+        return service.buscarPorCategoria(id);
+    }
+
     @PostMapping
     public Producto crear(@RequestBody ProductoDTO productoDTO) {  // Cambiado a ProductoDTO
         return service.guardar(productoDTO);
