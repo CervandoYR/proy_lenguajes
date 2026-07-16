@@ -80,10 +80,30 @@ export default function ProductCard({ product }) {
         </Link>
 
         {product.descripcion && (
-          <p className="text-surface-400 text-xs leading-relaxed mb-5 line-clamp-2">
+          <p className="text-surface-400 text-xs leading-relaxed mb-4 line-clamp-2">
             {product.descripcion}
           </p>
         )}
+
+        {/* Indicador Universal de Stock (Heurística Nielsen #1 Visibilidad del Estado & Diseño Apple) */}
+        <div className="mb-4">
+          {isOutOfStock ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+              <span>Agotado (0 disp.)</span>
+            </span>
+          ) : isLowStock ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+              <span>¡Stock crítico! Quedan {product.stock} unid.</span>
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span>Stock disponible ({product.stock} unid.)</span>
+            </span>
+          )}
+        </div>
 
         <div className="mt-auto pt-4 border-t border-surface-800/80 flex items-center justify-between gap-3">
           <div className="flex flex-col">
