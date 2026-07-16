@@ -41,6 +41,9 @@ public class AuthController {
     @org.springframework.beans.factory.annotation.Value("${brevo.api.key:${BREVO_API_KEY:}}")
     private String brevoApiKey;
 
+    @org.springframework.beans.factory.annotation.Value("${servitek.mail.from:Servitek Perú <notificaciones@netsystems.net.pe>}")
+    private String mailFrom;
+
     @GetMapping("/test-email")
     public ResponseEntity<?> testEmail(@RequestParam(defaultValue = "yrcervando01@gmail.com") String to) {
         java.util.Map<String, Object> resp = new java.util.HashMap<>();
@@ -51,8 +54,19 @@ public class AuthController {
                 headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
                 headers.set("api-key", brevoApiKey.trim());
 
+                String senderEmail = "notificaciones@netsystems.net.pe";
+                String senderName = "Servitek Perú";
+                if (mailFrom != null && mailFrom.contains("<") && mailFrom.contains(">")) {
+                    int start = mailFrom.indexOf('<');
+                    int end = mailFrom.indexOf('>');
+                    senderEmail = mailFrom.substring(start + 1, end).trim();
+                    senderName = mailFrom.substring(0, start).trim();
+                } else if (mailFrom != null && !mailFrom.trim().isEmpty()) {
+                    senderEmail = mailFrom.trim();
+                }
+
                 java.util.Map<String, Object> body = new java.util.HashMap<>();
-                body.put("sender", java.util.Map.of("name", "Servitek Perú", "email", "yrcervando01@gmail.com"));
+                body.put("sender", java.util.Map.of("name", senderName, "email", senderEmail));
                 body.put("to", java.util.List.of(java.util.Map.of("email", to)));
                 body.put("subject", "Prueba Brevo HTTPS API - Servitek");
                 body.put("htmlContent", "<h3>Hola desde Railway (Brevo API)</h3><p>El envío por HTTPS API (Puerto 443) funciona perfectamente y se salta el bloqueo de puertos de Railway.</p>");
